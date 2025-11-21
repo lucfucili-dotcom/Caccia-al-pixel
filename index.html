@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Caccia al Pixel – Livello 1</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px;
+      max-width: 700px;
+    }
+
+    .game-wrapper {
+      position: relative;
+      width: 80vmin;
+      height: 80vmin;
+      max-width: 600px;
+      max-height: 600px;
+      border: 2px solid #444;
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+      margin-bottom: 10px;
+      background-image: url("mappa-tesoro.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(40, 1fr);
+      grid-template-rows: repeat(40, 1fr);
+    }
+
+    .pixel-btn {
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .pixel-btn:focus {
+      outline: none;
+    }
+
+    .pixel-btn:hover {
+      outline: 1px solid rgba(255,255,255,0.3);
+    }
+
+    #message {
+      min-height: 1.6em;
+      font-size: 14px;
+      text-align: center;
+      color: #ccc;
+      padding: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Caccia al Pixel – Livello 1</h1>
+    <p>
+      Davanti a te c’è una mappa del tesoro in pixel art.<br>
+      Da qualche parte è nascosto un pixel speciale.<br>
+      <strong>Hai solo 2 tentativi</strong> per trovarlo.
+    </p>
+  </header>
+
+  <div class="game-wrapper">
+    <div class="grid-overlay" id="grid"></div>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const message = document.getElementById("message");
+
+    const ROWS = 40;
+    const COLS = 40;
+    const TOTAL = ROWS * COLS;
+
+    // Pixel vincente del livello 1 (puoi cambiare numero se vuoi)
+    const SECRET_INDEX = 512; // da 0 a TOTAL-1
+
+    const ATTEMPTS_KEY = "pixelGame_level1_attempts";
+    const BONUS_KEY = "pixelGame_bonus";
+
+    const MAX_ATTEMPTS = 2;
+
+    // Inizializza tentativi
+    let attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0", 10);
+
+    function updateMessage() {
+      if (attempts >= MAX_ATTEMPTS) {
+        message.textContent = "Hai esaurito i tuoi 2 tentativi per questo livello.";
+      } else if (attempts === 0) {
+        message.textContent = "Inizia a cliccare sulla mappa del tesoro…";
+      } else {
+        message.textContent = `Tentativi usati: ${attempts} / ${MAX_ATTEMPTS}`;
+      }
+    }
+
+    function handleClick(i) {
+      if (attempts >= MAX_ATTEMPTS) {
+        // Nessun altro tentativo disponibile
+        updateMessage();
+        return;
+      }
+
+      attempts++;
+      localStorage.setItem(ATTEMPTS_KEY, String(attempts));
+
+      if (i === SECRET_INDEX) {
+        // Pixel trovato: assegna bonus e vai alla pagina premio livello 1
+        localStorage.setItem(BONUS_KEY, "1");
+        window.location.href = "premio1.html";
+      } else {
+        if (attempts >= MAX_ATTEMPTS) {
+          message.textContent = "Non era questo… e hai finito i tentativi per il Livello 1.";
+        } else {
+          message.textContent = `Non è questo pixel… Tentativi usati: ${attempts} / ${MAX_ATTEMPTS}`;
+        }
+      }
+    }
+
+    // Crea griglia di pulsanti
+    for (let i = 0; i < TOTAL; i++) {
+      const btn = document.createElement("button");
+      btn.className = "pixel-btn";
+      btn.addEventListener("click", () => handleClick(i));
+      grid.appendChild(btn);
+    }
+
+    updateMessage();
+  </script>
+</body>
+</html>

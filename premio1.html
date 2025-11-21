@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Hai trovato il Pixel – Livello 1</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: #1b1b1b;
+      padding: 25px 30px;
+      border-radius: 12px;
+      max-width: 500px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.7);
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 15px;
+    }
+
+    button:hover {
+      filter: brightness(1.1);
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Hai trovato il pixel del tesoro! 🏴‍☠️</h1>
+    <p>
+      Complimenti, hai individuato il pixel nascosto sulla mappa del tesoro.<br>
+      Come ricompensa, hai sbloccato <strong>1 tentativo extra</strong>
+      da usare nel <strong>Livello 2</strong>.
+    </p>
+    <p>
+      Nel prossimo livello entrerai in un <strong>laboratorio segreto</strong>:
+      lì il pixel sarà ancora più difficile da trovare.
+    </p>
+
+    <button id="go">Vai al Livello 2</button>
+  </div>
+
+  <script>
+    const BONUS_KEY = "pixelGame_bonus";
+
+    // Se qualcuno arriva qui senza il bonus, lo reindirizziamo al livello 1
+    const hasBonus = localStorage.getItem(BONUS_KEY) === "1";
+    if (!hasBonus) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("go").addEventListener("click", () => {
+      window.location.href = "livello2.html";
+    });
+  </script>
+</body>
+</html>

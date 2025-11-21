@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <title>Caccia al Pixel – Livello 2</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: system-ui, sans-serif;
+      background: #111;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+    }
+
+    header {
+      text-align: center;
+      padding: 15px;
+      max-width: 700px;
+    }
+
+    .game-wrapper {
+      position: relative;
+      width: 80vmin;
+      height: 80vmin;
+      max-width: 600px;
+      max-height: 600px;
+      border: 2px solid #444;
+      box-shadow: 0 0 10px rgba(0,0,0,0.7);
+      margin-bottom: 10px;
+      background-image: url("laboratorio-segreto.png");
+      background-size: cover;
+      background-position: center;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(40, 1fr);
+      grid-template-rows: repeat(40, 1fr);
+    }
+
+    .pixel-btn {
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+      cursor: pointer;
+    }
+
+    .pixel-btn:focus {
+      outline: none;
+    }
+
+    .pixel-btn:hover {
+      outline: 1px solid rgba(255,255,255,0.3);
+    }
+
+    #message {
+      min-height: 1.6em;
+      font-size: 14px;
+      text-align: center;
+      color: #ccc;
+      padding: 0 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Caccia al Pixel – Livello 2</h1>
+    <p>
+      Sei entrato nel laboratorio segreto.<br>
+      Anche qui è nascosto un solo pixel speciale.<br>
+      <span id="info-tentativi"></span>
+    </p>
+  </header>
+
+  <div class="game-wrapper">
+    <div class="grid-overlay" id="grid"></div>
+  </div>
+
+  <div id="message"></div>
+
+  <script>
+    const grid = document.getElementById("grid");
+    const message = document.getElementById("message");
+    const infoTentativi = document.getElementById("info-tentativi");
+
+    const ROWS = 40;
+    const COLS = 40;
+    const TOTAL = ROWS * COLS;
+
+    // Pixel vincente del livello 2
+    const SECRET_INDEX = 973; // cambia numero se vuoi
+
+    const BONUS_KEY = "pixelGame_bonus";
+    const ATTEMPTS_KEY = "pixelGame_level2_attempts";
+
+    const baseMax = 2;
+    const hasBonus = localStorage.getItem(BONUS_KEY) === "1";
+    const MAX_ATTEMPTS = hasBonus ? baseMax + 1 : baseMax;
+
+    let attempts = parseInt(localStorage.getItem(ATTEMPTS_KEY) || "0", 10);
+
+    infoTentativi.textContent = hasBonus
+      ? "Hai 3 tentativi: 2 standard + 1 bonus dal Livello 1."
+      : "Hai 2 tentativi per trovare il pixel segreto.";
+
+    function updateMessage() {
+      if (attempts >= MAX_ATTEMPTS) {
+        message.textContent = `Hai esaurito i tuoi ${MAX_ATTEMPTS} tentativi per questo livello.`;
+      } else if (attempts === 0) {
+        message.textContent = "Osserva il laboratorio e prova a intuire dove cliccare…";
+      } else {
+        message.textContent = `Tentativi usati: ${attempts} / ${MAX_ATTEMPTS}`;
+      }
+    }
+
+    function handleClick(i) {
+      if (attempts >= MAX_ATTEMPTS) {
+        updateMessage();
+        return;
+      }
+
+      attempts++;
+      localStorage.setItem(ATTEMPTS_KEY, String(attempts));
+
+      if (i === SECRET_INDEX) {
+        // Resetto il bonus e i tentativi per evitare ri-uso incontrollato
+        localStorage.removeItem(BONUS_KEY);
+        window.location.href = "finale.html";
+      } else {
+        if (attempts >= MAX_ATTEMPTS) {
+          message.textContent = `Non era questo… e hai finito i tuoi ${MAX_ATTEMPTS} tentativi.`;
+        } else {
+          message.textContent = `No, non è questo pixel… Tentativi usati: ${attempts} / ${MAX_ATTEMPTS}`;
+        }
+      }
+    }
+
+    for (let i = 0; i < TOTAL; i++) {
+      const btn = document.createElement("button");
+      btn.className = "pixel-btn";
+      btn.addEventListener("click", () => handleClick(i));
+      grid.appendChild(btn);
+    }
+
+    updateMessage();
+  </script>
+</body>
+</html>
